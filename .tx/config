@@ -1,0 +1,7 @@
+[main]
+host = https://www.transifex.com
+
+[croston.qt-translation-020x]
+file_filter = src/qt/locale/croston_<lang>.ts
+source_file = src/qt/locale/croston_en.ts
+source_lang = en

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+#
+#  crostond The croston core server.
+#
+#
+# chkconfig: 345 80 20
+# description: crostond
+# processname: crostond
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/crostond, see below
+if [ -f /etc/sysconfig/crostond ]; then
+        . /etc/sysconfig/crostond
+fi
+
+RETVAL=0
+
+prog=crostond
+# you can override the lockfile via BITCOIND_LOCKFILE in /etc/sysconfig/crostond
+lockfile=${BITCOIND_LOCKFILE-/var/lock/subsys/crostond}
+
+# crostond defaults to /usr/bin/crostond, override with BITCOIND_BIN
+crostond=${BITCOIND_BIN-/usr/bin/crostond}
+
+# crostond opts default to -disablewallet, override with BITCOIND_OPTS
+crostond_opts=${BITCOIND_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $crostond $crostond_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog -t600
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
